@@ -11,12 +11,12 @@ namespace SeroJob.InsightDebugger
             Settings = null;
         }
 
-        public static void LogMessage(object sender, string message, bool applyProfile = true)
+        public static void LogMessage(object sender, string message, bool applyProfile = true, Object context = null)
         {
             LogMessage(sender.GetType().FullName, message, applyProfile);
         }
 
-        public static void LogMessage(string senderName, string message, bool applyProfile = true)
+        public static void LogMessage(string senderName, string message, bool applyProfile = true, Object context = null)
         {
             if (Settings == null) Settings = InsightDebuggerUtils.LoadSettings();
 
@@ -24,19 +24,19 @@ namespace SeroJob.InsightDebugger
 
             if (!applyProfile)
             {
-                LogUnprofiledMessage(message);
+                LogUnprofiledMessage(message, context);
                 return;
             }
 
-            LogProfiledMessage(senderName, message);
+            LogProfiledMessage(senderName, message, context);
         }
 
-        public static void LogWarning(object sender, string message, bool applyProfile = true)
+        public static void LogWarning(object sender, string message, bool applyProfile = true, Object context = null)
         {
-            LogWarning(sender.GetType().FullName, message, applyProfile);
+            LogWarning(sender.GetType().FullName, message, applyProfile, context);
         }
 
-        public static void LogWarning(string senderName, string message, bool applyProfile = true)
+        public static void LogWarning(string senderName, string message, bool applyProfile = true, Object context = null)
         {
             if (Settings == null) Settings = InsightDebuggerUtils.LoadSettings();
 
@@ -44,32 +44,32 @@ namespace SeroJob.InsightDebugger
 
             if (!applyProfile)
             {
-                LogUnprofiledWarning(message);
+                LogUnprofiledWarning(message, context);
                 return;
             }
 
-            LogProfiledWarning(senderName, message);
+            LogProfiledWarning(senderName, message, context);
         }
 
-        public static void LogError(object sender, string message, bool applyProfile = true)
+        public static void LogError(object sender, string message, bool applyProfile = true, Object context = null)
         {
-            LogError(sender.GetType().FullName, message, applyProfile);
+            LogError(sender.GetType().FullName, message, applyProfile, context);
         }
 
-        public static void LogError(string senderName, string message, bool applyProfile = true)
+        public static void LogError(string senderName, string message, bool applyProfile = true, Object context = null)
         {
             if (Settings == null) Settings = InsightDebuggerUtils.LoadSettings();
 
             if (!applyProfile)
             {
-                LogUnprofiledError(message);
+                LogUnprofiledError(message, context);
                 return;
             }
 
-            LogProfiledError(senderName, message);
+            LogProfiledError(senderName, message, context);
         }
 
-        private static void LogProfiledMessage(string senderName, string message)
+        private static void LogProfiledMessage(string senderName, string message, Object context)
         {
             var profile = InsightDebuggerUtils.GetProfileForSender(senderName, Settings);
 
@@ -78,15 +78,15 @@ namespace SeroJob.InsightDebugger
             var titleColorHtml = "#" + ColorUtility.ToHtmlStringRGB(profile.GetTitleColor());
             var messageColorHtml = "#" + ColorUtility.ToHtmlStringRGB(profile.GetMessageColor());
 
-            Debug.Log($"<color={titleColorHtml}>[{senderName}]</color>: <color={messageColorHtml}>{message}</color>");
+            Debug.Log($"<color={titleColorHtml}>[{senderName}]</color>: <color={messageColorHtml}>{message}</color>", context);
         }
 
-        private static void LogUnprofiledMessage(string message)
+        private static void LogUnprofiledMessage(string message, Object context)
         {
-            Debug.Log(message);
+            Debug.Log(message, context);
         }
 
-        private static void LogProfiledWarning(string senderName, string warning)
+        private static void LogProfiledWarning(string senderName, string warning, Object context)
         {
             var profile = InsightDebuggerUtils.GetProfileForSender(senderName, Settings);
 
@@ -95,15 +95,15 @@ namespace SeroJob.InsightDebugger
             var titleColorHtml = "#" + ColorUtility.ToHtmlStringRGB(profile.GetTitleColor());
             var warningColorHtml = "#" + ColorUtility.ToHtmlStringRGB(profile.GetWarningColor());
 
-            Debug.LogWarning($"<color={titleColorHtml}>[{senderName}]</color>: <color={warningColorHtml}>{warning}</color>");
+            Debug.LogWarning($"<color={titleColorHtml}>[{senderName}]</color>: <color={warningColorHtml}>{warning}</color>", context);
         }
 
-        private static void LogUnprofiledWarning(string warning)
+        private static void LogUnprofiledWarning(string warning, Object context)
         {
-            Debug.LogWarning(warning);
+            Debug.LogWarning(warning, context);
         }
 
-        private static void LogProfiledError(string senderName, string error)
+        private static void LogProfiledError(string senderName, string error, Object context)
         {
             var profile = InsightDebuggerUtils.GetProfileForSender(senderName, Settings);
 
@@ -112,12 +112,12 @@ namespace SeroJob.InsightDebugger
             var titleColorHtml = "#" + ColorUtility.ToHtmlStringRGB(profile.GetTitleColor());
             var errorColorHtml = "#" + ColorUtility.ToHtmlStringRGB(profile.GetErrorColor());
 
-            Debug.LogError($"<color={titleColorHtml}>[{senderName}]</color>: <color={errorColorHtml}>{error}</color>");
+            Debug.LogError($"<color={titleColorHtml}>[{senderName}]</color>: <color={errorColorHtml}>{error}</color>", context);
         }
 
-        private static void LogUnprofiledError(string error)
+        private static void LogUnprofiledError(string error, Object context)
         {
-            Debug.LogError(error);
+            Debug.LogError(error, context);
         }
     }
 }
