@@ -13,6 +13,10 @@ namespace SeroJob.InsightDebugger
 
         public static void LogMessage(object sender, string message, bool applyProfile = true)
         {
+            if (Settings == null) Settings = InsightDebuggerUtils.LoadSettings();
+
+            if (!Settings.DebugModeEnabled) return;
+
             if (!applyProfile)
             {
                 LogUnprofiledMessage(message);
@@ -22,12 +26,40 @@ namespace SeroJob.InsightDebugger
             LogProfiledMessage(sender, message);
         }
 
-        private static void LogProfiledMessage(object sender, string message)
+        public static void LogWarning(object sender, string message, bool applyProfile = true)
         {
             if (Settings == null) Settings = InsightDebuggerUtils.LoadSettings();
 
+            if (!Settings.DebugModeEnabled) return;
+
+            if (!applyProfile)
+            {
+                LogUnprofiledWarning(message);
+                return;
+            }
+
+            LogProfiledWarning(sender, message);
+        }
+
+        public static void LogError(object sender, string message, bool applyProfile = true)
+        {
+            if (Settings == null) Settings = InsightDebuggerUtils.LoadSettings();
+
+            if (!applyProfile)
+            {
+                LogUnprofiledError(message);
+                return;
+            }
+
+            LogProfiledError(sender, message);
+        }
+
+        private static void LogProfiledMessage(object sender, string message)
+        {
             var senderName = sender.GetType().FullName;
             var profile = InsightDebuggerUtils.GetProfileForSender(senderName, Settings);
+
+            if (profile.GetLogMode() != LogMode.All) return;
 
             var titleColorHtml = "#" + ColorUtility.ToHtmlStringRGBA(profile.GetTitleColor());
             var messageColorHtml = "#" + ColorUtility.ToHtmlStringRGBA(profile.GetMessageColor());
@@ -42,15 +74,15 @@ namespace SeroJob.InsightDebugger
 
         private static void LogProfiledWarning(object sender, string warning)
         {
-            if (Settings == null) Settings = InsightDebuggerUtils.LoadSettings();
-
             var senderName = sender.GetType().FullName;
             var profile = InsightDebuggerUtils.GetProfileForSender(senderName, Settings);
+
+            if (profile.GetLogMode() == LogMode.ErrorOnly || profile.GetLogMode() == LogMode.None) return;
 
             var titleColorHtml = "#" + ColorUtility.ToHtmlStringRGBA(profile.GetTitleColor());
             var warningColorHtml = "#" + ColorUtility.ToHtmlStringRGBA(profile.GetWarningColor());
 
-            Debug.Log($"<color={titleColorHtml}>[{senderName}]</color>: <color={warningColorHtml}>{warning}</color>");
+            Debug.LogWarning($"<color={titleColorHtml}>[{senderName}]</color>: <color={warningColorHtml}>{warning}</color>");
         }
 
         private static void LogUnprofiledWarning(string warning)
@@ -60,15 +92,15 @@ namespace SeroJob.InsightDebugger
 
         private static void LogProfiledError(object sender, string error)
         {
-            if (Settings == null) Settings = InsightDebuggerUtils.LoadSettings();
-
             var senderName = sender.GetType().FullName;
             var profile = InsightDebuggerUtils.GetProfileForSender(senderName, Settings);
+
+            if (profile.GetLogMode() == LogMode.None) return;
 
             var titleColorHtml = "#" + ColorUtility.ToHtmlStringRGBA(profile.GetTitleColor());
             var errorColorHtml = "#" + ColorUtility.ToHtmlStringRGBA(profile.GetErrorColor());
 
-            Debug.Log($"<color={titleColorHtml}>[{senderName}]</color>: <color={errorColorHtml}>{error}</color>");
+            Debug.LogError($"<color={titleColorHtml}>[{senderName}]</color>: <color={errorColorHtml}>{error}</color>");
         }
 
         private static void LogUnprofiledError(string error)

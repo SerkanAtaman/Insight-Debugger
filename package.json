@@ -1,6 +1,6 @@
 {
   "name": "com.serojob.insightdebugger",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "displayName": "Insight Debugger",
   "description": "A Simple Debug Extension For Log Colorizing",
   "unity": "2021.3",
