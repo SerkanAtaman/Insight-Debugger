@@ -13,6 +13,11 @@ namespace SeroJob.InsightDebugger
 
         public static void LogMessage(object sender, string message, bool applyProfile = true)
         {
+            LogMessage(sender.GetType().FullName, message, applyProfile);
+        }
+
+        public static void LogMessage(string senderName, string message, bool applyProfile = true)
+        {
             if (Settings == null) Settings = InsightDebuggerUtils.LoadSettings();
 
             if (!Settings.DebugModeEnabled) return;
@@ -23,10 +28,15 @@ namespace SeroJob.InsightDebugger
                 return;
             }
 
-            LogProfiledMessage(sender, message);
+            LogProfiledMessage(senderName, message);
         }
 
         public static void LogWarning(object sender, string message, bool applyProfile = true)
+        {
+            LogWarning(sender.GetType().FullName, message, applyProfile);
+        }
+
+        public static void LogWarning(string senderName, string message, bool applyProfile = true)
         {
             if (Settings == null) Settings = InsightDebuggerUtils.LoadSettings();
 
@@ -38,10 +48,15 @@ namespace SeroJob.InsightDebugger
                 return;
             }
 
-            LogProfiledWarning(sender, message);
+            LogProfiledWarning(senderName, message);
         }
 
         public static void LogError(object sender, string message, bool applyProfile = true)
+        {
+            LogError(sender.GetType().FullName, message, applyProfile);
+        }
+
+        public static void LogError(string senderName, string message, bool applyProfile = true)
         {
             if (Settings == null) Settings = InsightDebuggerUtils.LoadSettings();
 
@@ -51,18 +66,17 @@ namespace SeroJob.InsightDebugger
                 return;
             }
 
-            LogProfiledError(sender, message);
+            LogProfiledError(senderName, message);
         }
 
-        private static void LogProfiledMessage(object sender, string message)
+        private static void LogProfiledMessage(string senderName, string message)
         {
-            var senderName = sender.GetType().FullName;
             var profile = InsightDebuggerUtils.GetProfileForSender(senderName, Settings);
 
             if (profile.GetLogMode() != LogMode.All) return;
 
-            var titleColorHtml = "#" + ColorUtility.ToHtmlStringRGBA(profile.GetTitleColor());
-            var messageColorHtml = "#" + ColorUtility.ToHtmlStringRGBA(profile.GetMessageColor());
+            var titleColorHtml = "#" + ColorUtility.ToHtmlStringRGB(profile.GetTitleColor());
+            var messageColorHtml = "#" + ColorUtility.ToHtmlStringRGB(profile.GetMessageColor());
 
             Debug.Log($"<color={titleColorHtml}>[{senderName}]</color>: <color={messageColorHtml}>{message}</color>");
         }
@@ -72,15 +86,14 @@ namespace SeroJob.InsightDebugger
             Debug.Log(message);
         }
 
-        private static void LogProfiledWarning(object sender, string warning)
+        private static void LogProfiledWarning(string senderName, string warning)
         {
-            var senderName = sender.GetType().FullName;
             var profile = InsightDebuggerUtils.GetProfileForSender(senderName, Settings);
 
             if (profile.GetLogMode() == LogMode.ErrorOnly || profile.GetLogMode() == LogMode.None) return;
 
-            var titleColorHtml = "#" + ColorUtility.ToHtmlStringRGBA(profile.GetTitleColor());
-            var warningColorHtml = "#" + ColorUtility.ToHtmlStringRGBA(profile.GetWarningColor());
+            var titleColorHtml = "#" + ColorUtility.ToHtmlStringRGB(profile.GetTitleColor());
+            var warningColorHtml = "#" + ColorUtility.ToHtmlStringRGB(profile.GetWarningColor());
 
             Debug.LogWarning($"<color={titleColorHtml}>[{senderName}]</color>: <color={warningColorHtml}>{warning}</color>");
         }
@@ -90,15 +103,14 @@ namespace SeroJob.InsightDebugger
             Debug.LogWarning(warning);
         }
 
-        private static void LogProfiledError(object sender, string error)
+        private static void LogProfiledError(string senderName, string error)
         {
-            var senderName = sender.GetType().FullName;
             var profile = InsightDebuggerUtils.GetProfileForSender(senderName, Settings);
 
             if (profile.GetLogMode() == LogMode.None) return;
 
-            var titleColorHtml = "#" + ColorUtility.ToHtmlStringRGBA(profile.GetTitleColor());
-            var errorColorHtml = "#" + ColorUtility.ToHtmlStringRGBA(profile.GetErrorColor());
+            var titleColorHtml = "#" + ColorUtility.ToHtmlStringRGB(profile.GetTitleColor());
+            var errorColorHtml = "#" + ColorUtility.ToHtmlStringRGB(profile.GetErrorColor());
 
             Debug.LogError($"<color={titleColorHtml}>[{senderName}]</color>: <color={errorColorHtml}>{error}</color>");
         }
