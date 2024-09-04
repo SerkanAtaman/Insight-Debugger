@@ -4,11 +4,26 @@ namespace SeroJob.InsightDebugger
 {
     public static class InsightDebug
     {
-        public static InsightDebuggerSettings Settings { get; private set; }
+        public static InsightDebuggerSettings Settings
+        {
+            get
+            {
+                if (_settings == null) _settings = InsightDebuggerUtils.LoadSettings();
+                return _settings;
+            }
+        }
+
+        private static InsightDebuggerSettings _settings;
 
         static InsightDebug()
         {
-            Settings = null;
+            _settings = null;
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        public static void InitializeOnRuntime()
+        {
+            var _ = Settings;
         }
 
         public static void LogMessage(object sender, string message, bool applyProfile = true, Object context = null)
@@ -18,8 +33,6 @@ namespace SeroJob.InsightDebugger
 
         public static void LogMessage(string senderName, string message, bool applyProfile = true, Object context = null)
         {
-            if (Settings == null) Settings = InsightDebuggerUtils.LoadSettings();
-
             if (!Settings.DebugModeEnabled) return;
 
             if (!applyProfile)
@@ -38,8 +51,6 @@ namespace SeroJob.InsightDebugger
 
         public static void LogWarning(string senderName, string message, bool applyProfile = true, Object context = null)
         {
-            if (Settings == null) Settings = InsightDebuggerUtils.LoadSettings();
-
             if (!Settings.DebugModeEnabled) return;
 
             if (!applyProfile)
@@ -58,8 +69,6 @@ namespace SeroJob.InsightDebugger
 
         public static void LogError(string senderName, string message, bool applyProfile = true, Object context = null)
         {
-            if (Settings == null) Settings = InsightDebuggerUtils.LoadSettings();
-
             if (!applyProfile)
             {
                 LogUnprofiledError(message, context);
@@ -119,5 +128,13 @@ namespace SeroJob.InsightDebugger
         {
             Debug.LogError(error, context);
         }
+
+#if UNITY_EDITOR
+        [UnityEditor.Callbacks.DidReloadScripts]
+        public static void EditorInitialization()
+        {
+            var _ = Settings;
+        }
+#endif
     }
 }
