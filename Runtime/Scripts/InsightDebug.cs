@@ -1,3 +1,4 @@
+using UnityEditor.VersionControl;
 using UnityEngine;
 
 namespace SeroJob.InsightDebugger
@@ -84,10 +85,14 @@ namespace SeroJob.InsightDebugger
 
             if (profile.GetLogMode() != LogMode.All) return;
 
+#if UNITY_EDITOR
             var titleColorHtml = "#" + ColorUtility.ToHtmlStringRGB(profile.GetTitleColor());
             var messageColorHtml = "#" + ColorUtility.ToHtmlStringRGB(profile.GetMessageColor());
 
             Debug.Log($"<color={titleColorHtml}>[{senderName}]</color>: <color={messageColorHtml}>{message}</color>", context);
+#else
+            Debug.Log($"[{senderName}]: {message}", context);
+#endif
         }
 
         private static void LogUnprofiledMessage(string message, Object context)
@@ -101,10 +106,14 @@ namespace SeroJob.InsightDebugger
 
             if (profile.GetLogMode() == LogMode.ErrorOnly || profile.GetLogMode() == LogMode.None) return;
 
+#if UNITY_EDITOR
             var titleColorHtml = "#" + ColorUtility.ToHtmlStringRGB(profile.GetTitleColor());
             var warningColorHtml = "#" + ColorUtility.ToHtmlStringRGB(profile.GetWarningColor());
 
             Debug.LogWarning($"<color={titleColorHtml}>[{senderName}]</color>: <color={warningColorHtml}>{warning}</color>", context);
+#else
+            Debug.LogWarning($"[{senderName}]: {warning}", context);
+#endif
         }
 
         private static void LogUnprofiledWarning(string warning, Object context)
@@ -118,10 +127,14 @@ namespace SeroJob.InsightDebugger
 
             if (profile.GetLogMode() == LogMode.None) return;
 
+#if UNITY_EDITOR
             var titleColorHtml = "#" + ColorUtility.ToHtmlStringRGB(profile.GetTitleColor());
             var errorColorHtml = "#" + ColorUtility.ToHtmlStringRGB(profile.GetErrorColor());
 
             Debug.LogError($"<color={titleColorHtml}>[{senderName}]</color>: <color={errorColorHtml}>{error}</color>", context);
+#else
+            Debug.LogError($"[{senderName}]: {error}", context);
+#endif
         }
 
         private static void LogUnprofiledError(string error, Object context)
